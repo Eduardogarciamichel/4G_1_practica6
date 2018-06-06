@@ -8,6 +8,7 @@
 #fuses HS, NOFCMEN, NOIESO, PUT, NOBROWNOUT, NOWDT
 #fuses NOPBADEN, NOMCLR, STVREN, NOLVP, NODEBUG
 #use delay(clock=16000000)
+
 #BIT dataDht = 0xF82.4             //pin de dato de entrada del DHT11 portc
 #BIT dht_io = 0xF94.4  //bit 0 del tris b para ponerlo como entrada o salida
 #define __TEMPERATURA__  0x01
@@ -15,7 +16,7 @@
 int temperatura, temperaturaDecimal, humidity, humidityDecimal, checksum ;
 short timeOut;
 int cambio=0x01;
-int contador=0x01;
+int contadorTimer=0x01;
 int display[10] = {63,6,91,79,102,109,125,7,127,103};
 unsigned int dato[9] ={0} ;
 
@@ -30,12 +31,20 @@ int comprobacionDelChecksum();
 
 #INT_EXT
 void ISR_RB0(){
-   if( contador==2){
-      contador= 0x01;
+   if(cambio==2){
+      cambio= 0x01;
    }
    else{
-      contador++; 
+      cambio++; 
    }
+}
+
+#int_timer0
+void isr_timer0(){
+    contadorTimer<<=1;
+    if(contadorTimer>=8){
+        contadorTimer=1;
+    }
 }
 void main (void){
    configuracionesIniciales();
@@ -122,13 +131,13 @@ void temperaturaHumedad(){
    }
 }
 void mostrarDatos(){
-   if(contador==2){
-         output_a(contador);
-         output_d(display[dato[contador]]+128);
+   if(contadorTimer==2){
+         output_a(contadorTimer);
+         output_d(display[dato[contadorTimer]]+128);
       }
       else{
-         output_a(contador);
-         output_d(display[dato[contador]]);
+         output_a(contadorTimer);
+         output_d(display[dato[contadorTimer]]);
       } 
 }
 void configuracionesIniciales(){
