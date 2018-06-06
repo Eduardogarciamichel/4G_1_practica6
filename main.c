@@ -10,7 +10,8 @@
 #use delay(clock=16000000)
 #BIT dataDht = 0xF82.4             //pin de dato de entrada del DHT11 portc
 #BIT dht_io = 0xF94.4  //bit 0 del tris b para ponerlo como entrada o salida
-
+#define __TEMPERATURA__  0x01
+#define __HUMEDAD__  0X02
 int temperatura, temperaturaDecimal, humidity, humidityDecimal, checksum ;
 short timeOut;
 int cambio=0x01;
@@ -104,14 +105,14 @@ unsigned int readData(){
 
 void temperaturaHumedad(){
    switch(cambio){
-      case 1:
+      case __TEMPERATURA__:
          output_e(cambio);
          dato[1]=(int)temperatura/10;
          dato[2]=(int)temperatura%10;
          dato[4]=(int)temperaturaDecimal/10;
          dato[8]=(int)temperaturaDecimal%10;
       break;
-      case 2:
+      case __HUMEDAD__:
          output_e(cambio);
          dato[1]=(int)humidity/10;
          dato[2]=(int)humidity%10;
